@@ -23,6 +23,7 @@ foldersRouter
   })
   .post(jsonParser, (req, res, next) => {
     const { name } = req.body;
+    console.log(name, 'HERE');
     const newFolder = { name };
 
     for (const [key, value] of Object.entries(newFolder))
@@ -42,7 +43,6 @@ foldersRouter
   });
 
 foldersRouter
-  // need explanation of the .all block
   .route('/:folderId')
   .all((req, res, next) => {
     FoldersService.getById(req.app.get('db'), req.params.folderId)
