@@ -18,9 +18,7 @@ foldersRouter
 
 		FoldersService.getAllFolders(knexInstance)
 			.then((folders) => {
-				console.log(folders);
-				res.json({ id: 1, name: 'mmg' });
-				// res.json(folders.map(serializeFolder));
+				res.json(folders.map(serializeFolder));
 			})
 			.catch(next);
 	})
