@@ -17,6 +17,7 @@ foldersRouter.route('/').get(async (req, res, next) => {
 	try {
 		const folders = await FoldersService.getAllFolders(knexInstance);
 		console.log(folders, 'jhere await');
+		res.json(folders.map(serializeFolder));
 	} catch (err) {
 		next(err);
 	}
