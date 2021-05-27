@@ -13,11 +13,10 @@ const serializeFolder = (folder) => ({
 
 foldersRouter.route('/').get((req, res, next) => {
 	const knexInstance = req.app.get('db');
-	console.log('here');
 	FoldersService.getAllFolders(knexInstance)
 		.then((folders) => {
 			console.log('mmg');
-			res.json({ name: 'mmg' });
+			res.json({ id: 1, name: 'mmg' });
 			// res.json(folders.map(serializeFolder));
 		})
 		.catch(next);
