@@ -11,15 +11,23 @@ const serializeFolder = (folder) => ({
 	name: xss(folder.name),
 });
 
-foldersRouter.route('/').get((req, res, next) => {
+foldersRouter.route('/').get(async (req, res, next) => {
 	const knexInstance = req.app.get('db');
-	FoldersService.getAllFolders(knexInstance)
-		.then((folders) => {
-			console.log('mmg');
-			res.json({ id: 1, name: 'mmg' });
-			// res.json(folders.map(serializeFolder));
-		})
-		.catch(next);
+
+	try {
+		const folders = await FoldersService.getAllFolders(knexInstance);
+		console.log(folders, 'jhere await');
+	} catch (err) {
+		next(err);
+	}
+
+	// FoldersService.getAllFolders(knexInstance)
+	// 	.then((folders) => {
+	// 		console.log(folders);
+	// 		res.json({ id: 1, name: 'mmg' });
+	// 		// res.json(folders.map(serializeFolder));
+	// 	})
+	// .catch(next);
 });
 // 	.post(jsonParser, (req, res, next) => {
 // 		const { name } = req.body;
