@@ -1,6 +1,8 @@
 const FoldersService = {
 	getAllFolders(knex) {
-		return knex.select('*').from('noteful_folders');
+		const folders = knex.select('*').from('noteful_folders');
+		console.log(folders, 'here folders');
+		return folders;
 	},
 	insertFolder(knex, newFolder) {
 		return knex
