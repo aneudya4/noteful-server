@@ -16,6 +16,7 @@ foldersRouter.route('/').get((req, res, next) => {
 	console.log('here', knexInstance);
 	FoldersService.getAllFolders(knexInstance)
 		.then((folders) => {
+			console.log('mmg');
 			res.send({ mmg: 'mmg' });
 			// res.json(folders.map(serializeFolder));
 		})
