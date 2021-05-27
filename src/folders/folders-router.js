@@ -11,70 +11,64 @@ const serializeFolder = (folder) => ({
 	name: xss(folder.name),
 });
 
-foldersRouter.route('/').get(async (req, res, next) => {
-	const knexInstance = req.app.get('db');
+foldersRouter
+	.route('/')
+	.get((req, res, next) => {
+		const knexInstance = req.app.get('db');
 
-	try {
-		const folders = await FoldersService.getAllFolders(knexInstance);
-		res.json(folders.map(serializeFolder));
-	} catch (err) {
-		console.log('err', err);
-		return err;
-	}
+		FoldersService.getAllFolders(knexInstance)
+			.then((folders) => {
+				console.log(folders);
+				res.json({ id: 1, name: 'mmg' });
+				// res.json(folders.map(serializeFolder));
+			})
+			.catch(next);
+	})
+	.post(jsonParser, (req, res, next) => {
+		const { name } = req.body;
+		console.log(name, 'HERE');
+		const newFolder = { name };
 
-	// FoldersService.getAllFolders(knexInstance)
-	// 	.then((folders) => {
-	// 		console.log(folders);
-	// 		res.json({ id: 1, name: 'mmg' });
-	// 		// res.json(folders.map(serializeFolder));
-	// 	})
-	// .catch(next);
-});
-// 	.post(jsonParser, (req, res, next) => {
-// 		const { name } = req.body;
-// 		console.log(name, 'HERE');
-// 		const newFolder = { name };
+		for (const [key, value] of Object.entries(newFolder))
+			if (value == null)
+				return res.status(400).json({
+					error: { message: `Missing '${key}' in request body` },
+				});
 
-// 		for (const [key, value] of Object.entries(newFolder))
-// 			if (value == null)
-// 				return res.status(400).json({
-// 					error: { message: `Missing '${key}' in request body` },
-// 				});
+		FoldersService.insertFolder(req.app.get('db'), newFolder)
+			.then((folder) => {
+				res
+					.status(201)
+					.location(path.posix.join(req.originalUrl, `/${folder.id}`))
+					.json(serializeFolder(folder));
+			})
+			.catch(next);
+	});
 
-// 		FoldersService.insertFolder(req.app.get('db'), newFolder)
-// 			.then((folder) => {
-// 				res
-// 					.status(201)
-// 					.location(path.posix.join(req.originalUrl, `/${folder.id}`))
-// 					.json(serializeFolder(folder));
-// 			})
-// 			.catch(next);
-// 	});
-
-// foldersRouter
-// 	.route('/:folderId')
-// 	.all((req, res, next) => {
-// 		FoldersService.getById(req.app.get('db'), req.params.folderId)
-// 			.then((folder) => {
-// 				if (!folder) {
-// 					return res.status(404).json({
-// 						error: { message: `Folder doesn't exist` },
-// 					});
-// 				}
-// 				res.folder = folder;
-// 				next();
-// 			})
-// 			.catch(next);
-// 	})
-// 	.get((req, res, next) => {
-// 		res.json(serializeFolder(res.folder));
-// 	})
-// 	.delete((req, res, next) => {
-// 		FoldersService.deleteFolder(req.app.get('db'), req.params.folderId)
-// 			.then((numRowsAffected) => {
-// 				res.status(204).end();
-// 			})
-// 			.catch(next);
-// 	});
+foldersRouter
+	.route('/:folderId')
+	.all((req, res, next) => {
+		FoldersService.getById(req.app.get('db'), req.params.folderId)
+			.then((folder) => {
+				if (!folder) {
+					return res.status(404).json({
+						error: { message: `Folder doesn't exist` },
+					});
+				}
+				res.folder = folder;
+				next();
+			})
+			.catch(next);
+	})
+	.get((req, res, next) => {
+		res.json(serializeFolder(res.folder));
+	})
+	.delete((req, res, next) => {
+		FoldersService.deleteFolder(req.app.get('db'), req.params.folderId)
+			.then((numRowsAffected) => {
+				res.status(204).end();
+			})
+			.catch(next);
+	});
 
 module.exports = foldersRouter;
